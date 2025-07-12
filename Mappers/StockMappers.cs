@@ -1,5 +1,5 @@
-﻿using StockApp.DTOs;
-using StockApp.DTOs.Stock;
+﻿using StockApp.DTOs.Stock;
+using StockApp.Mappers;
 using StockApp.Models;
 
 namespace StockApp.Mapper
@@ -14,8 +14,9 @@ namespace StockApp.Mapper
                 Symbol = stock.Symbol,
                 CompanyName = stock.CompanyName,
                 Purchase = stock.Purchase,
-                Dividend = stock.Dividend
-
+                Dividend = stock.Dividend,
+                Industry = stock.Industry,
+                Comments = stock.Comments.Select(x => x.ToCommentDTO()).ToList()
             }; 
         }
 

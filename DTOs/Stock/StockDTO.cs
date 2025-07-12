@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using StockApp.DTOs.Comment;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StockApp.DTOs.Stock
 {
@@ -8,6 +9,8 @@ namespace StockApp.DTOs.Stock
         public string Symbol { get; set; } = string.Empty;
         public string CompanyName { get; set; } = string.Empty;
         public decimal Purchase { get; set; }
+        public string Industry { get; set; } = string.Empty;
         public decimal Dividend { get; set; }
+        public List<CommentDTO> Comments { get; set; } = new();
     }
 }
