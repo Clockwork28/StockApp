@@ -17,14 +17,14 @@ namespace StockApp.Mappers
             };
         }
 
-        public static Comment ToCommentFromRequest(this CreateCommentRequest request)
+        public static Comment ToCommentFromRequest(this CreateCommentRequest request, Guid stockId)
         {
             return new Comment
             {
-                Id = Guid.NewGuid(),
                 Title = request.Title,
                 Content = request.Content,
-                CreatedOn = DateTime.Now
+                StockId = stockId,
+                
             };
         }
     }

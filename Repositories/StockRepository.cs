@@ -18,6 +18,11 @@ namespace StockApp.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<bool> CheckIfExists(Guid id)
+        {
+            return await _dbContext.Stocks.AnyAsync(x => x.Id == id);
+        }
+
         public async Task<Stock> CreateAsync(CreateStockRequest request)
         {
             var stockModel = request.ToStockFromRequest();

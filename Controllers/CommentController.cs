@@ -10,10 +10,12 @@ namespace StockApp.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentRepository _commentRepo;
+        private readonly IStockRepository _stockRepo;
 
-        public CommentController(ICommentRepository commentRepo)
+        public CommentController(ICommentRepository commentRepo, IStockRepository stockRepo)
         {
             _commentRepo = commentRepo;
+            _stockRepo = stockRepo;
         }
 
         [HttpGet]
@@ -34,8 +36,10 @@ namespace StockApp.Controllers
         [HttpPost("{stockId}")]
         public async Task<IActionResult> Create(Guid stockId, [FromBody] CreateCommentRequest request)
         {
-            var comment = await _commentRepo.CreateAsync(stockId, request);
-            return comment == null ? BadRequest("Stock doesn't exist") : CreatedAtAction(nameof(GetById), new { id = comment.Id }, comment.ToCommentDTO());
+            if (!await _stockRepo.CheckIfExists(stockId)) return BadRequest($"Stock with id: {stockId} not found");
+            var comment = request.ToCommentFromRequest(stockId);
+            await _commentRepo.CreateAsync(comment);
+            return CreatedAtAction(nameof(GetById), new { id = comment.Id }, comment.ToCommentDTO());
         }
 
         [HttpPut("{id}")]

@@ -16,14 +16,10 @@ namespace StockApp.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Comment> CreateAsync(Guid stockId, CreateCommentRequest request)
+        public async Task<Comment> CreateAsync(Comment comment)
         {
-            var comment = request.ToCommentFromRequest();
-            comment.StockId = stockId;
-            comment.Stock = await _dbContext.Stocks.FindAsync(stockId);
-            if (comment.Stock == null) return null;
-            _dbContext.Comments.Add(comment);
-            _dbContext.SaveChanges();
+            await _dbContext.Comments.AddAsync(comment);
+            await _dbContext.SaveChangesAsync();
             return comment;
         }
 
@@ -32,7 +28,7 @@ namespace StockApp.Repositories
             var comment = await _dbContext.Comments.FindAsync(id);
             if (comment == null) return null;
             _dbContext.Comments.Remove(comment);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return comment;
         }
 
@@ -52,7 +48,7 @@ namespace StockApp.Repositories
             var comment = await _dbContext.Comments.FindAsync(id);
             if (comment == null) return null;
             _dbContext.Comments.Entry(comment).CurrentValues.SetValues(request);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return comment;
 
         }

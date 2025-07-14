@@ -7,7 +7,7 @@ namespace StockApp.Interfaces
     {
         public Task<List<Comment>> GetAllAsync();
         public Task<Comment?> GetByIdAsync(Guid id);
-        public Task<Comment> CreateAsync(Guid stockId, CreateCommentRequest request);
+        public Task<Comment> CreateAsync(Comment comment);
         public Task<Comment?> UpdateAsync(Guid id, UpdateCommentRequest request);
         public Task<Comment?> DeleteAsync(Guid id);
     }

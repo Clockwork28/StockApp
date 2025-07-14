@@ -11,6 +11,7 @@ namespace StockApp.Interfaces
         Task<Stock?> UpdateAsync(Guid id, UpdateStockRequest request);
         Task<Stock?> DeleteAsync(Guid id);
 
+        Task<bool> CheckIfExists(Guid id);
     }
 }
 
