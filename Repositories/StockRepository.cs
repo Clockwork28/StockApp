@@ -23,12 +23,11 @@ namespace StockApp.Repositories
             return await _dbContext.Stocks.AnyAsync(x => x.Id == id);
         }
 
-        public async Task<Stock> CreateAsync(CreateStockRequest request)
+        public async Task<Stock> CreateAsync(Stock stock)
         {
-            var stockModel = request.ToStockFromRequest();
-            await _dbContext.Stocks.AddAsync(stockModel);
+            await _dbContext.Stocks.AddAsync(stock);
             await _dbContext.SaveChangesAsync();
-            return stockModel;
+            return stock;
         }
 
         public async Task<Stock?> DeleteAsync(Guid id)

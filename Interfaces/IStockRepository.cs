@@ -7,7 +7,7 @@ namespace StockApp.Interfaces
     {
         Task<List<Stock>> GetAllAsync();
         Task<Stock?> GetByIdAsync(Guid id);
-        Task<Stock> CreateAsync(CreateStockRequest request);
+        Task<Stock> CreateAsync(Stock stock);
         Task<Stock?> UpdateAsync(Guid id, UpdateStockRequest request);
         Task<Stock?> DeleteAsync(Guid id);
 

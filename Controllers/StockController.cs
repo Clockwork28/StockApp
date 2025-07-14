@@ -36,7 +36,8 @@ namespace StockApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStockRequest request)
         {
-            var stock = await _stockRepo.CreateAsync(request);
+            var stock = request.ToStockFromRequest();
+            await _stockRepo.CreateAsync(stock);
             return CreatedAtAction(nameof(GetById), new {id = stock.Id}, stock.ToStockDTO());
         }
 
