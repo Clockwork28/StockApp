@@ -21,37 +21,42 @@ namespace StockApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            if (!ModelState.IsValid) return BadRequest();
             var comments = await _commentRepo.GetAllAsync();
             var commentDTOs = comments.Select(x => x.ToCommentDTO());
             return Ok(commentDTOs);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
+            if (!ModelState.IsValid) return BadRequest();
             var comment = await _commentRepo.GetByIdAsync(id);
             return comment == null ? NotFound() : Ok(comment.ToCommentDTO());
         }
 
-        [HttpPost("{stockId}")]
+        [HttpPost("{stockId:guid}")]
         public async Task<IActionResult> Create(Guid stockId, [FromBody] CreateCommentRequest request)
         {
+            if (!ModelState.IsValid) return BadRequest();
             if (!await _stockRepo.CheckIfExists(stockId)) return BadRequest($"Stock with id: {stockId} not found");
             var comment = request.ToCommentFromRequest(stockId);
             await _commentRepo.CreateAsync(comment);
             return CreatedAtAction(nameof(GetById), new { id = comment.Id }, comment.ToCommentDTO());
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCommentRequest request)
         {
+            if (!ModelState.IsValid) return BadRequest();
             var comment = await _commentRepo.UpdateAsync(id, request);
             return comment == null ? NotFound() : Ok(comment.ToCommentDTO());
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
+            if (!ModelState.IsValid) return BadRequest();
             var comment = await _commentRepo.DeleteAsync(id);
             return comment == null ? NotFound() : NoContent();
         }
