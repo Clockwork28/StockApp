@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using StockApp.Data;
 using StockApp.DTOs.Stock;
+using StockApp.Helpers;
 using StockApp.Interfaces;
 using StockApp.Mapper;
 using StockApp.Models;
@@ -39,9 +40,26 @@ namespace StockApp.Repositories
             return stock;
         }
 
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            return await _dbContext.Stocks.Include(x=>x.Comments).ToListAsync();
+            var stocks =  _dbContext.Stocks.Include(x=>x.Comments).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query.CompanyName)){
+                stocks = stocks.Where(x => x.CompanyName.Contains(query.CompanyName));
+            }
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(x => x.Symbol.Contains(query.Symbol));
+            }
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                stocks = query.SortBy.ToLower() switch
+                {
+                    "symbol" => query.SortDescending ? stocks.OrderByDescending(x => x.Symbol) : stocks.OrderBy(x => x.Symbol),
+                    "companyname" => query.SortDescending ? stocks.OrderByDescending(x => x.CompanyName) : stocks.OrderBy(x => x.CompanyName),
+                    _ => stocks
+                };
+            }
+            return await stocks.ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(Guid id)

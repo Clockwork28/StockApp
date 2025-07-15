@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockApp.Data;
 using StockApp.DTOs.Stock;
+using StockApp.Helpers;
 using StockApp.Interfaces;
 using StockApp.Mapper;
 
@@ -19,10 +20,10 @@ namespace StockApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var stocks = await _stockRepo.GetAllAsync();
+            var stocks = await _stockRepo.GetAllAsync(query);
             var stockDTOs = stocks.Select(x => x.ToStockDTO());
             return Ok(stockDTOs);
         }
