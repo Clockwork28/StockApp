@@ -22,7 +22,7 @@ namespace StockApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             var stocks = await _stockRepo.GetAllAsync(query);
             var stockDTOs = stocks.Select(x => x.ToStockDTO());
             return Ok(stockDTOs);
@@ -31,7 +31,7 @@ namespace StockApp.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             var stock = await _stockRepo.GetByIdAsync(id);
             return stock == null ? NotFound() : Ok(stock.ToStockDTO());
         }
@@ -39,7 +39,7 @@ namespace StockApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStockRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             var stock = request.ToStockFromRequest();
             await _stockRepo.CreateAsync(stock);
             return CreatedAtAction(nameof(GetById), new {id = stock.Id}, stock.ToStockDTO());
@@ -49,7 +49,7 @@ namespace StockApp.Controllers
 
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateStockRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             var stock = await _stockRepo.UpdateAsync(id, request);
             return stock == null? NotFound() : Ok(stock.ToStockDTO());
         }
@@ -57,7 +57,7 @@ namespace StockApp.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             var stock = await _stockRepo.DeleteAsync(id);
             return stock == null ? NotFound() : NoContent();
         }
