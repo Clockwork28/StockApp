@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using StockApp.DTOs.Account;
+using StockApp.Interfaces;
 using StockApp.Models;
 
 namespace StockApp.Controllers
@@ -10,9 +11,11 @@ namespace StockApp.Controllers
     public class AccountController :ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
-        public AccountController(UserManager<AppUser> userManager)
+        private readonly ITokenService _tokenService;
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService)
         {
             _userManager = userManager;
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
@@ -30,7 +33,14 @@ namespace StockApp.Controllers
                 if (userCreated.Succeeded)
                 {
                     var roleAssigned = await _userManager.AddToRoleAsync(appUser, "User");
-                    if (roleAssigned.Succeeded) return Ok("User created");
+                    if (roleAssigned.Succeeded) return Ok(
+                        new NewUserDTO
+                        {
+                            UserName = appUser.UserName,
+                            Email = appUser.Email,
+                            Token = _tokenService.CreateToken(appUser)   
+                        }
+                    );
                     else return StatusCode(400, roleAssigned.Errors);
                 }
                 else return StatusCode(400, userCreated.Errors);
