@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StockApp.DTOs.Account;
 using StockApp.Interfaces;
 using StockApp.Models;
@@ -12,10 +13,12 @@ namespace StockApp.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService)
+        private readonly SignInManager<AppUser> _signInManager;
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _tokenService = tokenService;
+            _signInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -49,6 +52,22 @@ namespace StockApp.Controllers
             {
                 return StatusCode(500, e);
             }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDTO loginDTO)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDTO.Username);
+            if (user == null) return Unauthorized("Username or Password is invalid");
+            var loginResult = await _signInManager.CheckPasswordSignInAsync(user, loginDTO.Password, false);
+            if (!loginResult.Succeeded) return Unauthorized("Username or Password is invalid");
+            return Ok(new NewUserDTO
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Token = _tokenService.CreateToken(user)
+            });
         }
     }
 }
