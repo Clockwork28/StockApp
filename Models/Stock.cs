@@ -2,6 +2,7 @@
 
 namespace StockApp.Models
 {
+    [Table("Stocks")]
     public class Stock
     {
         public required Guid Id { get; set; } = Guid.NewGuid();
@@ -16,5 +17,6 @@ namespace StockApp.Models
         public long MarketCap { get; set; }
 
         public List<Comment> Comments { get; set; } = new();
+        public List<Portfolio> Portfolios { get; set; } = new();
     }
 }

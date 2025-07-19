@@ -12,8 +12,8 @@ using StockApp.Data;
 namespace StockApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250717205403_SeedRole")]
-    partial class SeedRole
+    [Migration("20250719201254_PortfolioManyToMany")]
+    partial class PortfolioManyToMany
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace StockApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3bf917e7-5e2b-49a5-aafb-bd48f2924806",
+                            Id = "73228c93-3970-4ab8-aa9d-0ea10e09a2cc",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "8e4519ab-d199-47d7-85f9-08faff045eaf",
+                            Id = "f10bb3b8-c3ad-45fd-8cec-bb169e8a5a26",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -264,6 +264,21 @@ namespace StockApp.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("StockApp.Models.Portfolio", b =>
+                {
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("StockId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AppUserId", "StockId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Portfolios");
+                });
+
             modelBuilder.Entity("StockApp.Models.Stock", b =>
                 {
                     b.Property<Guid>("Id")
@@ -356,9 +371,35 @@ namespace StockApp.Migrations
                     b.Navigation("Stock");
                 });
 
+            modelBuilder.Entity("StockApp.Models.Portfolio", b =>
+                {
+                    b.HasOne("StockApp.Models.AppUser", "AppUser")
+                        .WithMany("Portfolios")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StockApp.Models.Stock", "Stock")
+                        .WithMany("Portfolios")
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("StockApp.Models.AppUser", b =>
+                {
+                    b.Navigation("Portfolios");
+                });
+
             modelBuilder.Entity("StockApp.Models.Stock", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Portfolios");
                 });
 #pragma warning restore 612, 618
         }
