@@ -34,12 +34,12 @@ namespace StockApp.Repositories
 
         public async Task<List<Comment>> GetAllAsync()
         {
-            return await _dbContext.Comments.ToListAsync();
+            return await _dbContext.Comments.Include(x => x.AppUser).ToListAsync();
         }
 
         public async Task<Comment?> GetByIdAsync(Guid id)
         {
-            var comment = await _dbContext.Comments.FindAsync(id);
+            var comment = await _dbContext.Comments.Include(x => x.AppUser).FirstOrDefaultAsync(x=>x.Id == id);
             return comment;
         }
 

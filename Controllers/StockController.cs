@@ -26,7 +26,7 @@ namespace StockApp.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var stocks = await _stockRepo.GetAllAsync(query);
-            var stockDTOs = stocks.Select(x => x.ToStockDTO());
+            var stockDTOs = stocks.Select(x => x.ToStockDTO()).ToList();
             return Ok(stockDTOs);
         }
 

@@ -64,7 +64,7 @@ namespace StockApp.Controllers
         public async Task<IActionResult> Delete(string symbol)
         {
             var username = User.GetUsername();
-            if (username == null) return BadRequest("Username not found");
+            if (username == null) return Unauthorized("Username not found");
             var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return BadRequest("User not found");
             var stock = await _stockRepo.GetBySymbolAsync(symbol);
