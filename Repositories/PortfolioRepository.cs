@@ -36,5 +36,14 @@ namespace StockApp.Repositories
             await _dbContext.SaveChangesAsync();
             return portfolio;
         }
+
+        public async Task<Portfolio?> DeletePortfolio(AppUser user, string symbol)
+        {
+            var userPortfolio = await _dbContext.Portfolios.FirstOrDefaultAsync(x=>x.AppUserId == user.Id && x.Stock.Symbol.ToLower() == symbol.ToLower());
+            if (userPortfolio == null) return null;
+            _dbContext.Portfolios.Remove(userPortfolio);
+            await _dbContext.SaveChangesAsync();
+            return userPortfolio;
+        }
     }
 }

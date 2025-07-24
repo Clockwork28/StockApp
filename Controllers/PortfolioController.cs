@@ -24,7 +24,7 @@ namespace StockApp.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetUserPortfolio()
+        public async Task<IActionResult> Get()
         {
             var username = User.GetUsername();
             if (username == null) return NotFound("Username not found");
@@ -35,7 +35,7 @@ namespace StockApp.Controllers
         }
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Create(string stockSymbol)
+        public async Task<IActionResult> Add(string stockSymbol)
         {
             var username = User.GetUsername();
             if (username == null) return BadRequest("Username not found");
@@ -58,6 +58,20 @@ namespace StockApp.Controllers
             if (portfolioModel == null) return StatusCode(500, "Couldn't create portfolio");
             return Created();
 
+        }
+        [HttpDelete]
+        [Authorize]
+        public async Task<IActionResult> Delete(string symbol)
+        {
+            var username = User.GetUsername();
+            if (username == null) return BadRequest("Username not found");
+            var appUser = await _userManager.FindByNameAsync(username);
+            if (appUser == null) return BadRequest("User not found");
+            var stock = await _stockRepo.GetBySymbolAsync(symbol);
+            if (stock == null) return BadRequest("Stock not found");
+            var deleted = await _portfolioRepo.DeletePortfolio(appUser, symbol);
+            if (deleted == null) return NotFound("Stock not in your portfolio");
+            return NoContent();
         }
     }
 }
