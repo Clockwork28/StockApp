@@ -69,6 +69,11 @@ namespace StockApp.Repositories
             return await _dbContext.Stocks.Include(x=>x.Comments).FirstOrDefaultAsync(x=>x.Id == id);
         }
 
+        public async Task<Stock?> GetBySymbolAsync(string symbol)
+        {
+            return await _dbContext.Stocks.FirstOrDefaultAsync(x => x.Symbol == symbol);
+        }
+
         public async Task<Stock?> UpdateAsync(Guid id, UpdateStockRequest request)
         {
             var stock = await _dbContext.Stocks.FindAsync(id);

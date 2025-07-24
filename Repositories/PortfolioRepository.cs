@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using StockApp.Data;
 using StockApp.Interfaces;
 using StockApp.Models;
@@ -27,6 +28,13 @@ namespace StockApp.Repositories
                 Comments = stock.Stock.Comments,
                 Portfolios = stock.Stock.Portfolios
             }).ToListAsync();
+        }
+
+        public async Task<Portfolio> CreatePortfolio(Portfolio portfolio)
+        {
+            await _dbContext.Portfolios.AddAsync(portfolio);
+            await _dbContext.SaveChangesAsync();
+            return portfolio;
         }
     }
 }

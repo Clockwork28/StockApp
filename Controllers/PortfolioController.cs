@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using StockApp.Extensions;
 using StockApp.Interfaces;
+using StockApp.Mappers;
 using StockApp.Models;
 
 namespace StockApp.Controllers
@@ -31,6 +32,32 @@ namespace StockApp.Controllers
             if (appUser == null) return NotFound("User not found");
             var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
             return Ok(userPortfolio);
+        }
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Create(string stockSymbol)
+        {
+            var username = User.GetUsername();
+            if (username == null) return BadRequest("Username not found");
+            var appUser = await _userManager.FindByNameAsync(username);
+            if (appUser == null) return BadRequest("User not found");
+            var stock = await _stockRepo.GetBySymbolAsync(stockSymbol);
+            if (stock == null) return BadRequest("Stock not found");
+            var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
+            if (userPortfolio.Any(x => x.Symbol.ToLower() == stockSymbol.ToLower())) return BadRequest("Cannot add the same stock twice");
+                
+            var portfolioModel  = new Portfolio
+            {
+                AppUserId = appUser.Id,
+                AppUser = appUser,
+                StockId = stock.Id,
+                Stock = stock
+            };
+
+            portfolioModel = await _portfolioRepo.CreatePortfolio(portfolioModel);
+            if (portfolioModel == null) return StatusCode(500, "Couldn't create portfolio");
+            return Created();
+
         }
     }
 }

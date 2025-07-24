@@ -8,6 +8,7 @@ namespace StockApp.Interfaces
     {
         Task<List<Stock>> GetAllAsync(QueryObject query);
         Task<Stock?> GetByIdAsync(Guid id);
+        Task<Stock?> GetBySymbolAsync(string symbol);
         Task<Stock> CreateAsync(Stock stock);
         Task<Stock?> UpdateAsync(Guid id, UpdateStockRequest request);
         Task<Stock?> DeleteAsync(Guid id);

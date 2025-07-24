@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StockApp.DTOs.Comment;
 using StockApp.Interfaces;
 using StockApp.Mappers;
@@ -19,6 +20,7 @@ namespace StockApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -28,6 +30,7 @@ namespace StockApp.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> GetById(Guid id)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -36,6 +39,7 @@ namespace StockApp.Controllers
         }
 
         [HttpPost("{stockId:guid}")]
+        [Authorize]
         public async Task<IActionResult> Create(Guid stockId, [FromBody] CreateCommentRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -46,6 +50,7 @@ namespace StockApp.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCommentRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -54,6 +59,7 @@ namespace StockApp.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid id)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
