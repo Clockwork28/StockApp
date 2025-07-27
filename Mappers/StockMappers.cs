@@ -33,5 +33,18 @@ namespace StockApp.Mapper
                 Industry = stock.Industry,
             };
         }
+        public static Stock ToStockFromFMP (this FMPStock FMPstock)
+        {
+            return new Stock
+            {
+                Id = Guid.NewGuid(),
+                Symbol = FMPstock.symbol,
+                CompanyName = FMPstock.companyName,
+                MarketCap = FMPstock.mktCap,
+                Purchase = (decimal)FMPstock.price,
+                Dividend = (decimal)FMPstock.lastDiv,
+                Industry = FMPstock.industry,
+            };
+        }
     }
 }

@@ -5,6 +5,7 @@ using StockApp.Extensions;
 using StockApp.Interfaces;
 using StockApp.Mappers;
 using StockApp.Models;
+using StockApp.Services;
 
 namespace StockApp.Controllers
 {
@@ -15,11 +16,13 @@ namespace StockApp.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IStockRepository _stockRepo;
         private readonly IPortfolioRepository _portfolioRepo;
-        public PortfolioController(UserManager<AppUser> userManager, IStockRepository stockRepository, IPortfolioRepository portfolioRepository)
+        private readonly IFMPService _fmpService;
+        public PortfolioController(UserManager<AppUser> userManager, IStockRepository stockRepository, IPortfolioRepository portfolioRepository, IFMPService fmpService)
         {
             _userManager = userManager;
             _stockRepo = stockRepository;
             _portfolioRepo = portfolioRepository;
+            _fmpService = fmpService;
         }
 
         [HttpGet]
@@ -35,16 +38,21 @@ namespace StockApp.Controllers
         }
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Add(string stockSymbol)
+        public async Task<IActionResult> Add(string symbol)
         {
             var username = User.GetUsername();
             if (username == null) return BadRequest("Username not found");
             var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return BadRequest("User not found");
-            var stock = await _stockRepo.GetBySymbolAsync(stockSymbol);
-            if (stock == null) return BadRequest("Stock not found");
+            var stock = await _stockRepo.GetBySymbolAsync(symbol);
+            if (stock == null)
+            {
+                stock = await _fmpService.FindStockBySymbolAsync(symbol);
+                if (stock == null) return BadRequest("Stock does not exist");
+                else await _stockRepo.CreateAsync(stock);
+            }
             var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
-            if (userPortfolio.Any(x => x.Symbol.ToLower() == stockSymbol.ToLower())) return BadRequest("Cannot add the same stock twice");
+            if (userPortfolio.Any(x => x.Symbol.ToLower() == symbol.ToLower())) return BadRequest("Cannot add the same stock twice");
                 
             var portfolioModel  = new Portfolio
             {
